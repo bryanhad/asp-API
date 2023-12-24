@@ -5,6 +5,7 @@ const env = cleanEnv(process.env, {
     MONGODB_ATLAS_STRING: str(),
     NODE_ENV: str(),
     WEBSITE_URL: str(),
+    SESSION_SECRET: str(),
 })
 
 export default env

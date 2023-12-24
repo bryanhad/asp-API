@@ -6,6 +6,7 @@ const validateRequest = (schema: Schema): RequestHandler => {
     return (req, res, next) => {
         try {
             schema.parse(req)
+            next()
         } catch (err) {
             if (err instanceof ZodError) {
                 next(createHttpError(400, err.message))
