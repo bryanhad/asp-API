@@ -43,7 +43,46 @@ const createAdmin: RequestHandler<
     }
 }
 
+const createUser: RequestHandler<
+    unknown,
+    unknown,
+    CreateUserReqBody
+> = async (req, res, next) => {
+    const { username, email, password, role } = req.body
+    try {
+        const usernameExists = await userModel
+            .findOne({ username })
+            .collation({ locale: 'en', strength: 2 })
+            .exec()
+        
+        if (usernameExists) {
+            throw createHttpError(409, 'Username already taken')
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        const result = await userModel.create({
+            username,
+            email,
+            password: hashedPassword,
+            displayName: username,
+            role,
+        })
+
+        const newAdmin = result.toObject()
+        delete newAdmin.password
+
+        req.logIn(newAdmin, (err) => {
+            //login would pass the first argument, which is a user objet that has a _id key on it, and would be passed to the passport's serializeUser! it would get the session from the db, and append an Id key to the
+            if (err) throw err
+            res.status(201).json(newAdmin)
+        }) //this req.login function is added by passport!
+    } catch (err) {
+        next(err)
+    }
+}
 
 export class UserController {
     static createAdmin = createAdmin
+    static createUser = createUser
 }

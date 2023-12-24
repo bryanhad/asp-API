@@ -6,17 +6,19 @@ import mongoose from 'mongoose'
 
 
 passport.serializeUser((user, cb) => {
+    console.log(user, 'SERIALIZE USER')
     //after the user logged in successfuly, the user returned from our localStrategy OR the req.login 
     // would be passed to this function! where now, we can decide what data should be stored in the session! we can do that via the cb function!
     //basically this func purpose is to handle writing the user's session into our database
-    cb(null, user._id)
+    cb(null, {id: user._id, role: user.role})
 })
 
-passport.deserializeUser((userId: string, cb) => {
+passport.deserializeUser(({id, role}: {id:string, role:string}, cb) => {
+    console.log({id, role}, 'DESERIALIZE USER')
     //this function purpose is to handle everytime there is a request to the server, passport would get the user's session from our database and will pass the data we stored to the first param of this func, which is 'userId'!, then passport would attach the thing that we return from this deeserializeUser function to the request object! in the req.user
     // so that we can use the data from the stored session into our endpoints
 
-    cb(null, { _id: new mongoose.Types.ObjectId(userId) })
+    cb(null, { _id: new mongoose.Types.ObjectId(id), role })
 })
 
 

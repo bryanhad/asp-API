@@ -31,9 +31,10 @@ const sessionConfig: SessionOptions = {
     }),
     genid(req) { //generate our own session id!
         const userId = req.user?._id //get the user's Id from passport
+        const userRole = req.user?.role
         const randomId = crypto.randomUUID() //generate radom string ID
         if (userId) {
-            return `${userId}-${randomId}`
+            return `${userId}-bebekkuda-${randomId}`
         } else {
             return randomId
         }
